@@ -1,13 +1,43 @@
+// TODO: add docs
+
 import { serve } from 'bun';
 
 import type {
     Route,
+    RouteOptions,
     RouteRequest,
     RouteResponse,
     Headers,
+    HttpMethod,
 } from './types/route';
 
-export const _routes = new Map<Route['url'], Route>();
+type WrappedRouteCallback = (request: Request) => Response;
+
+type PreparedRoute = Record<HttpMethod, WrappedRouteCallback>;
+
+export const _routes = new Map<RouteOptions['url'], RouteOptions>();
+
+const wrapRouteCallback = (
+    routeOptions: RouteOptions
+): WrappedRouteCallback => {
+    return () => Response.json();
+};
+
+const prepareRoute = (route: Route): Partial<PreparedRoute> => {
+    const preparedRoute: Partial<PreparedRoute> = {};
+
+    for (const routeMethod of Object.entries(route) as [
+        HttpMethod,
+
+        RouteOptions
+    ][]) {
+        preparedRoute[routeMethod[0]] = wrapRouteCallback(routeMethod[1]);
+    }
+
+    return preparedRoute;
+};
+
+const preparedRoutes: Record<RouteOptions['url'], PreparedRoute> = {};
 
 export const listen = (port?: number, hostname?: string): void => {
     serve({
@@ -15,45 +45,6 @@ export const listen = (port?: number, hostname?: string): void => {
 
         hostname,
 
-        fetch: (request) => {
-            let body: unknown;
-            let headers: Headers = {};
-            let status: number = 200;
-
-            const currentRoute = _routes.get(request.url);
-
-            if (!currentRoute) {
-                return new Response(undefined, {
-                    status: 404,
-                    statusText: 'Not Found',
-                });
-            }
-
-            const routeRequest: RouteRequest = {
-                ...request,
-            };
-
-            request.json().then((body) => {
-                routeRequest.body = body;
-            });
-
-            const routeResponse: RouteResponse = {
-                setHeader: (name, value) => {
-                    headers[name] = value;
-                },
-
-                send: (data) => {
-                    body = data;
-                },
-            };
-
-            currentRoute.onRequest?.(routeRequest, routeResponse);
-
-            currentRoute.preHandler?.(routeRequest, routeResponse);
-
-            currentRoute.handler(routeRequest, routeResponse);
-
-            return new Response(JSON.stringify(body), { headers, status });
-        },
+        routes: preparedRoutes,
     });
 };

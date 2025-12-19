@@ -1,13 +1,16 @@
+// TODO: add docs
+
 export type HttpMethod =
     | 'GET'
     | 'POST'
     | 'PUT'
-    | 'PATCH1'
+    | 'PATCH'
     | 'DELETE'
     | 'OPTIONS';
 
 export type Header = {
     name: string;
+
     value: string;
 };
 
@@ -29,6 +32,10 @@ export interface RouteResponse<
 }
 
 export type Route = {
+    [K in HttpMethod]: RouteOptions;
+};
+
+export type RouteOptions = {
     url: string;
     method: HttpMethod;
 
