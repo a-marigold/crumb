@@ -1,8 +1,15 @@
 {
     "name": "crumb-bun",
-    "module": "index.ts",
-    "type": "module",
+    "author": "marigold",
+    "license": "UNLICENSED",
+    "version": "0.0.0",
+    "keywords": [
+        "typescript",
+        "bun"
+    ],
     "private": true,
+    "type": "module",
+    "module": "index.ts",
     "devDependencies": {
         "@types/bun": "latest"
     },

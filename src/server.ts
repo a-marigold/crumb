@@ -12,6 +12,7 @@ export const routes = new Map<RouteRequest['url'], Route>();
 export const listen = (port: number, hostname?: string): void => {
     serve({
         port,
+
         hostname,
 
         fetch: (request) => {
