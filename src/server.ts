@@ -23,7 +23,8 @@ const wrapRouteCallback = (
     routeOptions: RouteOptions
 ): WrappedRouteCallback => {
     return (request) => {
-        let status = 200;
+        let status: number = 200;
+        let statusText: string | undefined = undefined;
 
         let body: unknown = null;
 
@@ -36,8 +37,10 @@ const wrapRouteCallback = (
                 headers[name] = value;
             },
 
-            send: (data) => {
+            send: (data, options) => {
                 body = data;
+                status = options.status;
+                statusText = options.statusText;
             },
         };
 
@@ -53,7 +56,11 @@ const wrapRouteCallback = (
 
         routeOptions.handler(routeRequest, routeResponse);
 
-        return new Response(JSON.stringify(body), { headers, status });
+        return new Response(JSON.stringify(body), {
+            headers,
+            status,
+            statusText,
+        });
     };
 };
 

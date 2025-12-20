@@ -15,17 +15,22 @@ export type Header = {
 };
 export type Headers = ResponseInit['headers'];
 
-export type RouteRequest<T extends { body: unknown } = { body: unknown }> =
-    Omit<Request, 'body'> & {
-        body: T extends { body: unknown } ? T['body'] : unknown;
-    };
+export interface RouteRequest<T extends { body: unknown } = { body: unknown }>
+    extends Omit<Request, 'body'> {
+    body: T extends { body: unknown } ? T['body'] : unknown;
+}
+
+export interface ResponseOptions {
+    status: number;
+    statusText?: string;
+}
 
 export interface RouteResponse<
     T extends { body: unknown } = { body: unknown }
 > {
     setHeader: (name: Header['name'], value: Header['value']) => void;
 
-    send: (data: T['body']) => void;
+    send: (data: T['body'], options: ResponseOptions) => void;
 }
 
 export type Route = Partial<Record<HttpMethod, RouteOptions>>;
