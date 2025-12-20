@@ -1,6 +1,7 @@
 // TODO: add docs
 
 import { serve } from 'bun';
+
 import type { BunRequest } from 'bun';
 
 import type {
@@ -12,7 +13,8 @@ import type {
     HttpMethod,
 } from './types/route';
 
-type WrappedRouteCallback = (request: BunRequest) => Response;
+type WrappedRouteCallback = (request: BunRequest) => Promise<Response>;
+
 type PreparedRoute = Partial<Record<HttpMethod, WrappedRouteCallback>>;
 
 type PreparedRoutes = Record<RouteOptions['url'], PreparedRoute>;
@@ -24,42 +26,48 @@ const wrapRouteCallback = (
 ): WrappedRouteCallback => {
     return (request) => {
         let status: number | undefined = undefined;
+
         let statusText: string | undefined = undefined;
 
-        let body: unknown = null;
-
+        let responseBody: unknown = null;
         let headers: Headers = {};
 
         const routeRequest: RouteRequest = request;
 
-        const routeResponse: RouteResponse = {
-            setHeader: (name, value) => {
-                headers[name] = value;
-            },
+        const bodyPromise = request.body?.json() ?? Promise.resolve(undefined);
 
-            send: (data, options) => {
-                body = data;
-                status = options?.status;
-                statusText = options?.statusText;
-            },
-        };
+        return bodyPromise.then((data) => {
+            routeRequest.body = data;
 
-        if (typeof body === 'object') {
-            headers['Content-Type'] = 'application/json';
-        } else {
-            headers['Content-Type'] = 'text/plain';
-        }
+            const routeResponse: RouteResponse = {
+                setHeader: (name, value) => {
+                    headers[name] = value;
+                },
 
-        routeOptions.onRequest?.(routeRequest, routeResponse);
+                send: (data, options) => {
+                    responseBody = data;
+                    status = options?.status;
+                    statusText = options?.statusText;
+                },
+            };
 
-        routeOptions.preHandler?.(routeRequest, routeResponse);
+            if (typeof responseBody === 'object') {
+                headers['Content-Type'] = 'application/json';
+            } else {
+                headers['Content-Type'] = 'text/plain';
+            }
 
-        routeOptions.handler(routeRequest, routeResponse);
+            routeOptions.onRequest?.(routeRequest, routeResponse);
 
-        return new Response(JSON.stringify(body), {
-            headers,
-            status,
-            statusText,
+            routeOptions.preHandler?.(routeRequest, routeResponse);
+
+            routeOptions.handler(routeRequest, routeResponse);
+
+            return new Response(JSON.stringify(responseBody), {
+                headers,
+                status,
+                statusText,
+            });
         });
     };
 };
