@@ -1,1 +1,82 @@
-# crumb-bun
+crumb-bun
+
+Utility library for creating APIs with Bun
+
+Features
+
+Only Bun is supported
+
+No classes
+
+Uses Bun’s HTTP API
+
+Installation
+
+```bash
+bun add crumb-bun
+```
+
+Usage
+Handling Requests
+
+```typescript
+import { createRoute, type RouteResponse } from 'crumb-bun';
+
+type Product = { title: string; price: number; id: number };
+
+const products: Product[] = [];
+
+createRoute({
+    url: '/products',
+    method: 'GET',
+    handler: (request, response: RouteResponse<{ body: Product[] }>) => {
+        return response.send(
+            [
+                { title: 'cookie', price: 100, id: 1 },
+                { title: 'bread', price: 1600, id: 2 },
+            ],
+            { status: 200 }
+        );
+    },
+});
+```
+
+Middleware / Pre-handlers
+
+```typescript
+import { createRoute, type RouteResponse } from 'crumb-bun';
+
+type Product = { title: string; price: number; id: number };
+
+const products: Product[] = [];
+
+createRoute({
+    url: '/products',
+    method: 'POST',
+    preHandler: (request, response) => {
+        if (products.find((product) => product.id === request.body.id)) {
+            return response.send(
+                { message: 'Product with this id already exists' },
+                { status: 409 }
+            );
+        }
+    },
+    handler: (request, response: RouteResponse<{ body: Product }>) => {
+        products.push(body);
+
+        return response.send(body, { status: 201 });
+    },
+});
+```
+
+Setting Headers and Status
+
+```typescript
+import { createRoute } from 'crumb-bun';
+
+createRoute({
+    url: '/auth',
+    method: 'POST',
+    handler: (request, response) => {},
+});
+```
