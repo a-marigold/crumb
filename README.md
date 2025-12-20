@@ -1,8 +1,8 @@
-crumb-bun
+## crumb-bun
 
 Utility library for creating APIs with Bun
 
-Features
+### Features
 
 Only Bun is supported
 
@@ -10,13 +10,14 @@ No classes
 
 Uses Bun’s HTTP API
 
-Installation
+### Installation
 
 ```bash
 bun add crumb-bun
 ```
 
-Usage
+### Usage
+
 Handling Requests
 
 ```typescript
@@ -40,6 +41,8 @@ createRoute({
     },
 });
 ```
+
+&nbsp;
 
 Middleware / Pre-handlers
 
@@ -68,6 +71,8 @@ createRoute({
     },
 });
 ```
+
+&nbsp;
 
 Setting Headers and Status
 
