@@ -11,9 +11,9 @@ import type {
     HttpMethod,
 } from './types/route';
 
-type WrappedRouteCallback = (request: BunRequest) => Promise<Response>;
-
 type PreparedRoute = Partial<Record<HttpMethod, WrappedRouteCallback>>;
+
+export type WrappedRouteCallback = (request: BunRequest) => Promise<Response>;
 
 /**
  * Used straight as Bun.serve `routes` object.
@@ -26,13 +26,16 @@ type PreparedRoutes = Record<RouteOptions['url'], PreparedRoute>;
 export const _routes = new Map<RouteOptions['url'], Route>();
 
 /**
+ * Internal `server` function.
  * Creates a function with handler and all route hooks.
  * The created function can be used as a callback for route in Bun.serve `routes` object.
+ *
+ *
  *
  * @param routeOptions options of route
  * @returns {WrappedRouteCallback} Function that is ready to be used in Bun.serve `routes`
  */
-const wrapRouteCallback = (
+export const wrapRouteCallback = (
     routeOptions: RouteOptions
 ): WrappedRouteCallback => {
     return (request) => {
@@ -41,10 +44,10 @@ const wrapRouteCallback = (
         let statusText: string | undefined = undefined;
 
         let responseBody: unknown = null;
+
         let headers: Headers = {};
 
         const routeRequest: RouteRequest = request;
-
         const bodyPromise = request.body?.json() ?? Promise.resolve(undefined);
 
         return bodyPromise.then((data) => {
@@ -74,7 +77,6 @@ const wrapRouteCallback = (
             routeOptions.preHandler?.(routeRequest, routeResponse);
 
             routeOptions.handler(routeRequest, routeResponse);
-
             return new Response(JSON.stringify(responseBody), {
                 headers,
                 status,
@@ -85,6 +87,7 @@ const wrapRouteCallback = (
 };
 
 /**
+ * Internal `server` function.
  * Prepares a route to be used in Bun.serve `routes` object.
  *
  * @param {Route} route
@@ -121,7 +124,7 @@ const wrapRouteCallback = (
  * ```
  *
  */
-const prepareRoute = (route: Route): PreparedRoute => {
+export const prepareRoute = (route: Route): PreparedRoute => {
     const preparedRoute: Partial<PreparedRoute> = {};
 
     for (const routeMethod of Object.entries(route) as [
@@ -136,11 +139,12 @@ const prepareRoute = (route: Route): PreparedRoute => {
 };
 
 /**
+ * Internal server function.
  * Calls `prepareRoute` for every route of `_routes` Map and returns prepared routes to use in Bun.serve `routes`.
  *
  * @returns {PreparedRoutes} An object that is used straight in Bun.serve `routes` object.
  */
-const prepareRoutes = (): PreparedRoutes => {
+export const prepareRoutes = (): PreparedRoutes => {
     const preparedRoutes: PreparedRoutes = {};
 
     for (const route of _routes) {
@@ -162,7 +166,9 @@ const prepareRoutes = (): PreparedRoutes => {
  *
  * ```typescript
  * import { listen } from 'crumb-bun';
+ *
  * const PORT = proccess.env['PORT'] || 1000;
+ *
  * listen(PORT, 'localhost');
  * ```
  */
