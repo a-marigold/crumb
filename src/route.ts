@@ -12,12 +12,12 @@ import type { RouteOptions } from './types';
  *
  *
  *
- * @example <caption> Route with anonymous handler  </caption>
+ * @example
  * ```typescript
  * createRoute({
- *  url: '*',
- *  method: 'GET',
- *  handler: (request, response) => {
+ *   url: '*',
+ *   method: 'GET',
+ *   handler: (request, response) => {
  *     response.send(
  *       { message: 'The resource you are looking for is not found.' },
  *       { status: 404, statusText: 'Not Found' }
@@ -26,33 +26,33 @@ import type { RouteOptions } from './types';
  * });
  * ```
  *
- * @example <caption> Route with handler as external function </caption>
+ * @example
  * ```typescript
  * const deleteProduct = (
- *  request: RouteRequest,
- *  response: RouteResponse<{ body: { error: string } | { product: Product } }>
+ *   request: RouteRequest,
+ *   response: RouteResponse<{ body: { error: string } | { product: Product } }>
  * ) => {
- *   const id = request.params.id;
+ *     const id = request.params.id;
  *
- *   if (!(id in products)) {
- *       return response.send(
+ *     if (!(id in products)) {
+ *         return response.send(
+ *           { error: 'Product with this id is not found' },
+ *           { status: 404 }
+ *         );
+ *     }
  *
- *        { error: 'Product with this id is not found' },
- *        { status: 404 }
- *      );
- *  }
- *  const product = products[id];
+ *     const product = products[id];
  *
- *  products[id] = null;
+ *     products[id] = null;
  *
- *  return response.send(product);
+ *     return response.send(product);
  * };
  *
  * createRoute({
- *    url: '/products/:id',
- *    method: 'DELETE',
+ *   url: '/products/:id',
+ *   method: 'DELETE',
  *
- *    handler: deleteProduct,
+ *   handler: deleteProduct,
  * });
  * ```
  */
