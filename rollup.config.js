@@ -8,7 +8,7 @@ import terser from '@rollup/plugin-terser';
 
 export default defineConfig([
     {
-        external: ['bun'],
+        external: ['bun', './src/__tests__'],
 
         input: './src/index.ts',
 
@@ -17,7 +17,7 @@ export default defineConfig([
 
             format: 'esm',
         },
-        plugins: [typescript(), terser()],
+        plugins: [typescript({ exclude: ['**/__tests__/**'] }), terser()],
     },
     {
         input: './src/index.ts',

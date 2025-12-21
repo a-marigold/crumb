@@ -198,6 +198,8 @@ export const prepareRoute = (route: Route): PreparedRoute => {
  * Internal server function.
  * Calls `prepareRoute` for every route of `_routes` Map and returns prepared routes to use in Bun.serve `routes`.
  *
+ * @param {Routes} routes Map with routes to prepare.
+ *
  * @returns {PreparedRoutes} An object that is used straight in Bun.serve `routes` object.
  */
 export const prepareRoutes = (routes: Routes): PreparedRoutes => {
