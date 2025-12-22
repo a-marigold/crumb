@@ -264,6 +264,7 @@ export const prepareRoutes = (
     for (const route of routes) {
         preparedRoutes[route[0]] = prepareRoute(route[1], schemaValidator);
     }
+    routes.clear();
 
     return preparedRoutes;
 };

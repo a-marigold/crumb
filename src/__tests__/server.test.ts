@@ -83,6 +83,7 @@ describe('prepareRoutes', () => {
                     GET: {
                         url: '/test1',
                         method: 'GET',
+
                         handler: (request, response) => {},
                     },
                     POST: {
@@ -107,6 +108,8 @@ describe('prepareRoutes', () => {
 
         const testPreparedRoutes = prepareRoutes(testRoutes);
 
+        expect(Object.keys(testPreparedRoutes).length).toBe(2);
+
         expect(
             '/test1' in testPreparedRoutes &&
                 'GET' in testPreparedRoutes['/test1'] &&
@@ -125,6 +128,51 @@ describe('prepareRoutes', () => {
 
         expect(testPreparedRoutes['/test1']?.GET).toBeTypeOf('function');
         expect(testPreparedRoutes['/test2']?.PATCH).toBeTypeOf('function');
+    });
+
+    it('should clear routes after preparing correctly', () => {
+        const testRoutes: Routes = new Map([
+            [
+                '/test',
+                {
+                    GET: { url: '/test', method: 'GET', handler: () => {} },
+                    POST: {
+                        url: '/test',
+                        method: 'POST',
+                        preHandler: () => {},
+                        handler: () => {},
+                    },
+                },
+            ],
+            [
+                '/test1',
+                {
+                    GET: { url: '/test', method: 'GET', handler: () => {} },
+                    POST: {
+                        url: '/test',
+                        method: 'POST',
+                        preHandler: () => {},
+                        handler: () => {},
+                    },
+                },
+            ],
+            [
+                '/test2',
+                {
+                    GET: { url: '/test', method: 'GET', handler: () => {} },
+                    POST: {
+                        url: '/test',
+                        method: 'POST',
+                        preHandler: () => {},
+                        handler: () => {},
+                    },
+                },
+            ],
+        ]);
+
+        prepareRoutes(testRoutes);
+
+        expect(testRoutes.size).toBe(0);
     });
 });
 
