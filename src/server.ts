@@ -151,6 +151,8 @@ const handleRequest = (
  *
  *
  *
+ *
+ *
  * @param routeOptions options of route
  * @returns {WrappedRouteCallback} Function that is ready to be used in Bun.serve `routes`
  */
@@ -175,10 +177,15 @@ export const wrapRouteCallback = (
                 }
             })
             .then((bodyData) => {
-                const routeRequest: RouteRequest = Object.create(request);
-                routeRequest.body = bodyData;
+                const routeRequest: Partial<RouteRequest> = request;
 
-                return handleRequest(routeRequest, routeOptions);
+                routeRequest.parsedBody = bodyData;
+
+                return handleRequest(
+                    // assertion is not dangerous because `parsedBody` is identified above
+                    routeRequest as RouteRequest,
+                    routeOptions
+                );
             });
     };
 };

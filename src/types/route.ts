@@ -31,9 +31,13 @@ export type Headers = ResponseInit['headers'];
 /**
  * Type of route handler `request`
  */
-export interface RouteRequest<T extends { body: unknown } = { body: unknown }>
-    extends Omit<BunRequest, 'body'> {
-    body: T extends { body: unknown } ? T['body'] : unknown;
+export interface RouteRequest<
+    T extends { parsedBody: unknown } = { parsedBody: unknown }
+> extends Omit<BunRequest, 'body'> {
+    /**
+     * Parsed, validated from schema body of reqeust
+     */
+    parsedBody: T extends { parsedBody: unknown } ? T['parsedBody'] : unknown;
 }
 
 export interface ResponseOptions {
