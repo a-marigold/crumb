@@ -39,7 +39,7 @@ export const _routes: Routes = new Map();
  *
  * @param {BunRequest} request incoming bun request
  * @param {string} contentType request `Content-Type` header value
- * @param {Schema} schema
+ * @param {Schema} schema json or any schema with declared `Schema` type
  * @param {Validate} schemaValidator
  *
  * @returns {Promise<unknown>} Promise with body
@@ -100,7 +100,7 @@ export const handleBody = (
 };
 
 const handleRequest = (
-    request: RouteRequest,
+    routeRequest: RouteRequest,
     routeOptions: RouteOptions
 ): Response => {
     let status: number | undefined = undefined;
@@ -109,7 +109,6 @@ const handleRequest = (
     let responseBody: unknown = null;
     const responseHeaders: Headers = {};
 
-    const routeRequest: RouteRequest = request;
     const routeResponse: RouteResponse = {
         setHeader: (name, value) => {
             responseHeaders[name] = value;
