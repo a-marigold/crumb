@@ -25,7 +25,7 @@ describe('wrapRouteCallback', () => {
             url: '/test',
             method: 'GET',
 
-            handler: (request, response) => {
+            handler: (_request, response) => {
                 return response.send(responseData);
             },
         });
@@ -49,7 +49,7 @@ describe('wrapRouteCallback', () => {
         const jsonWrappedCallback = wrapRouteCallback({
             url: '/test',
             method: 'GET',
-            handler: (request, response) => {
+            handler: (_request, response) => {
                 response.send(jsonResponseData);
             },
         });
@@ -73,11 +73,10 @@ describe('wrapRouteCallback', () => {
         const jsonWrappedCallback = wrapRouteCallback({
             url: '/test',
             method: 'GET',
-            handler: (request, response) => {
+            handler: (_request, response) => {
                 response.send(textResponesData);
             },
         });
-
         const testRequest = new Request('https://localhost:3000') as BunRequest;
 
         jsonWrappedCallback(testRequest).then((response) => {
@@ -94,11 +93,12 @@ describe('wrapRouteCallback', () => {
         type TestBody = { price: number };
 
         const testSchema = { price: 100 };
-        const schemaValidator: Validate = (data, schema: any) => {
+        const schemaValidator: Validate = (data, schema) => {
             return (
                 typeof data === 'object' &&
                 data !== null &&
                 'price' in data &&
+                'price' in schema &&
                 typeof data.price === typeof schema.price
             );
         };
@@ -143,7 +143,7 @@ describe('prepareRoute', () => {
                 url: '/test/url',
                 method: 'POST',
 
-                handler: (request, response) => {
+                handler: (_request, response) => {
                     return response.send(responseData);
                 },
             },
@@ -177,12 +177,12 @@ describe('prepareRoutes', () => {
                         url: '/test1',
                         method: 'GET',
 
-                        handler: (request, response) => {},
+                        handler: () => {},
                     },
                     POST: {
                         url: '/test1',
                         method: 'POST',
-                        handler: (request, response) => {},
+                        handler: () => {},
                     },
                 },
             ],
@@ -193,7 +193,7 @@ describe('prepareRoutes', () => {
                     PATCH: {
                         url: '/test2',
                         method: 'PATCH',
-                        handler: (request, response) => {},
+                        handler: () => {},
                     },
                 },
             ],
@@ -320,13 +320,13 @@ describe('handleBody', () => {
             },
         } as BunRequest;
 
-        const schema = 'Test Data';
+        const testSchema = 'Test Data';
 
         const schemaValidator: Validate = (data, schema) => {
-            return data === testData;
+            return data === schema;
         };
 
-        handleBody(testRequest, 'text/plain', schema, schemaValidator);
+        handleBody(testRequest, 'text/plain', testSchema, schemaValidator);
     });
 
     it('should throw an error if text/plain does not match schema', () => {

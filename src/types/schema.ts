@@ -1,5 +1,5 @@
 /**
- * The global Schema type that will be used in every
+ * The global Schema type that reflects schema type in `Validate` function
  *
  * @default {}
  *
@@ -9,9 +9,11 @@
  * // types/global.d.ts
  * import type { ZodType } from 'zod';
  *
+ *
+ *
  * declare module 'crumb-bun' {
  *    interface Schema {
- *        zod: ZodType
+ *        zod: ZodType;
  *    }
  * }
  * ```
@@ -23,6 +25,7 @@
  * }
  * ```
  */
+// biome-ignore lint: lint/correctness/noUnusedFunctionParameters
 export interface Schema {}
 
 /**
