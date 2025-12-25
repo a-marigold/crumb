@@ -207,15 +207,13 @@ export const wrapRouteCallback = (
  *       method: 'GET',
  *       handler: (request, response) => {},
  *   },
- *   POST: {`
+ *   POST: {
  *     url: '/products/:id',
  *       method: 'POST',
  *       handler: (request, response) => {},
  *   },
  * });
- *
  * // Output will be:
- *
  * ({
  *   GET: (request: BunRequest) => {
  *     // ...code
@@ -251,7 +249,7 @@ export const prepareRoute = (
 
 /**
  * Internal server function.
- * Calls `prepareRoute` for every route of `_routes` Map and returns prepared routes to use in Bun.serve `routes`.
+ * Calls `prepareRoute` for every route of `routes` Map and returns prepared routes to use in Bun.serve `routes`.
  *
  * @param {Routes} routes Map with routes to prepare.
  *

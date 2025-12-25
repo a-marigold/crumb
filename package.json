@@ -1,9 +1,13 @@
 {
     "name": "crumb-bun",
-    "version": "0.1.6",
+    "version": "0.1.8",
     "author": "marigold",
     "module": "dist/index.js",
     "license": "UNLICENSED",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/a-marigold/crumb-bun"
+    },
     "devDependencies": {
         "@biomejs/biome": "^2.3.10",
         "@rollup/plugin-terser": "^0.4.4",
