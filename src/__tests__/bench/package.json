@@ -8,6 +8,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "crumb-bun": "^0.1.8"
+    "crumb-bun": "^0.1.9",
+    "zod": "^4.2.1"
   }
 }

@@ -1,6 +1,6 @@
 {
     "name": "crumb-bun",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "author": "marigold",
     "module": "dist/index.js",
     "license": "UNLICENSED",

@@ -13,7 +13,7 @@ import type {
     HttpMethod,
 } from './types/route';
 
-import type { Schema, Validate } from './types';
+import type { SchemaData, Validate } from './types';
 
 import type { ListenOptions } from './types';
 
@@ -46,7 +46,8 @@ export const _routes: Routes = new Map();
 export const handleBody = (
     request: BunRequest,
     contentType: string,
-    schema?: Schema,
+
+    schema?: SchemaData,
     schemaValidator?: Validate
 ): Promise<unknown> => {
     const contentHandlers = {
