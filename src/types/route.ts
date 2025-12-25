@@ -1,7 +1,7 @@
 // TODO: add docs
 
 import type { BunRequest } from 'bun';
-import type { Schema } from './schema';
+import type { SchemaData } from './schema';
 
 /**
  * HTTP Method primitive.
@@ -66,7 +66,7 @@ export type RouteOptions = {
     url: string;
     method: HttpMethod;
 
-    schema?: Schema;
+    schema?: SchemaData;
 
     onRequest?: RouteHandler;
 

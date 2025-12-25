@@ -13,9 +13,9 @@ import type {
     HttpMethod,
 } from './types/route';
 
-import type { Schema, Validate } from './types/schema';
+import type { Schema, Validate } from './types';
 
-import type { ListenOptions } from './types/server';
+import type { ListenOptions } from './types';
 
 type PreparedRoute = Partial<Record<HttpMethod, WrappedRouteCallback>>;
 
@@ -32,15 +32,14 @@ export type Routes = Map<RouteOptions['url'], Route>;
  * An internal Map with routes of app. Do not use it in user code to prevent undefined errors
  */
 export const _routes: Routes = new Map();
-
 /**
  * Runtime function that used in request.
  * Parses body to supported content type (json, plain text) and validates it with route schema.
  *
- * @param {BunRequest} request incoming bun request
- * @param {string} contentType request `Content-Type` header value
- * @param {Schema} schema json or any schema with declared `Schema` type
- * @param {Validate} schemaValidator
+ * @param {BunRequest} request incoming bun request.
+ * @param {string} contentType request `Content-Type` header value.
+ * @param {Schema} schema json or any schema with declared `Schema` type.
+ * @param {Validate} schemaValidator schema validator function that receives `data` and `schema` arguments.
  *
  * @returns {Promise<unknown>} Promise with body
  */

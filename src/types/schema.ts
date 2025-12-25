@@ -34,3 +34,5 @@ export interface Schema {}
  * Supports any schemas like `zod`, `ajv`, `yup`
  */
 export type Validate = (data: unknown, schema: Schema) => boolean;
+
+export type SchemaData = Schema[keyof Schema];
