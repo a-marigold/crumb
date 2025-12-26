@@ -8,15 +8,20 @@ import type { Validate } from 'crumb-bun';
 
 import { MB_MULTIPLIER } from './constants/MB_MULTIPLIER';
 
+console.log(
+    `Initial memory usage: ${process.memoryUsage().rss / MB_MULTIPLIER}mb`
+);
+
 const requestDataSchema = record(
     string(),
+
     object({ key: object({ key: number() }), boolean: boolean() })
 );
 
 const requestData: Partial<zInfer<typeof requestDataSchema>> = {};
 
 const createRequestDataLoopStart = performance.now();
-for (let i = 0; i < 100_000; i++) {
+for (let i = 0; i <= 100_000; i++) {
     requestData[`key_${i}`] = { key: { key: i }, boolean: true };
 }
 const createRequestDataLoopEnd = performance.now();

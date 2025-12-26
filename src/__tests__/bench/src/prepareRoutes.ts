@@ -2,8 +2,12 @@ import { createRoute, prepareRoutes, _routes } from 'crumb-bun';
 
 import { MB_MULTIPLIER } from './constants/MB_MULTIPLIER';
 
+console.log(
+    `Initial memory usage: ${process.memoryUsage().rss / MB_MULTIPLIER}mb`
+);
+
 const createRoutesLoopStart = performance.now();
-for (let i = 0; i < 1_000_000; i++) {
+for (let i = 0; i <= 1_000_000; i++) {
     createRoute({
         url: `/test${i}`,
         method: 'POST',
