@@ -1,19 +1,25 @@
-## crumb-bun
+# <div align='center'> <a> **Crumb** </a> </div>
 
-Utility library for creating APIs with Bun
+<div align='center'>  
+ 
+ [![CI](https://github.com/a-marigold/crumb/actions/workflows/ci.yaml/badge.svg)](https://github.com/a-marigold/crumb/actions)
+
+[![npm](https://img.shields.io/npm/v/crumb)](https://npmjs.com)
+
+</div>
 
 ### Features
 
-Only Bun is supported
+-   Only Bun is supported
 
-No classes
+-   No classes
 
-Uses Bun’s HTTP API
+-   Uses Bun’s HTTP API
 
 ### Installation
 
 ```bash
-bun add crumb-bun
+bun add crumb
 ```
 
 ### Usage

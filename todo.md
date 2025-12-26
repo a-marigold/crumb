@@ -4,3 +4,5 @@
 
 -   [] divide route schema on:
     request, response schemas
+
+-   Schema['data'] interface

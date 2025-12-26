@@ -50,5 +50,3 @@ console.log(
     `'handleBody' function called in ${handleBodyEnd - handleBodyStart}ms`
 );
 console.log(`Memory usage: ${process.memoryUsage().rss / MB_MULTIPLIER}mb`);
-for (const element of new Map()) {
-}
