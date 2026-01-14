@@ -54,8 +54,8 @@ export const handleBody = (
         'application/json': (request: BunRequest) => {
             return request
                 .json()
-                .catch((error) => {
-                    throw new HttpError(400, error);
+                .catch(() => {
+                    throw new HttpError(400, 'Bad Request');
                 })
                 .then((data) => {
                     if (
@@ -170,13 +170,14 @@ export const wrapRouteCallback = (
                 contentType,
                 routeOptions.schema,
                 schemaValidator
-            ).then((bodyData) => bodyData);
+            );
         };
 
         return Promise.resolve(
             handleRequest(
                 // assertion is not dangerous because `handleBody` function is identified above
                 routeRequest as RouteRequest,
+
                 routeOptions
             )
         )

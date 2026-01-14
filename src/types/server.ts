@@ -1,5 +1,10 @@
 import type { Validate } from './schema';
 
+/**
+ *
+ *
+ * Type of `options` parameter in `listen` function
+ */
 export interface ListenOptions {
     /**
      * Server port to listen
@@ -8,7 +13,6 @@ export interface ListenOptions {
 
     /**
      * Server hostname to listen
-     *
      * @example `localhost`, `0.0.0.0`
      *
      */
