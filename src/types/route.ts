@@ -17,7 +17,8 @@ export type HttpMethod =
     | 'PUT'
     | 'PATCH'
     | 'DELETE'
-    | 'OPTIONS';
+    | 'OPTIONS'
+    | 'HEAD';
 
 export type RedirectStatusCode = 300 | 301 | 302 | 303 | 304 | 307 | 308;
 
@@ -31,13 +32,53 @@ export type Header = {
 
 export type Headers = ResponseInit['headers'];
 
+export type RouteRequestParams<T extends string | undefined = undefined> = [
+    T
+] extends [string]
+    ? {
+          [K in T]: string;
+      }
+    : { [key: string]: string | undefined };
+
+/**
+ *
+ *
+ * Type of RouteRequest generic
+ *
+ *
+ *
+ *
+ *
+ */
+export interface RouteRequestGeneric {
+    body?: unknown;
+
+    params?: string;
+}
+
 /**
  * Type of route handler `request`
  */
-export interface RouteRequest<T extends { body: unknown } = { body: unknown }>
-    extends Omit<BunRequest, 'body'> {
+export interface RouteRequest<
+    T extends RouteRequestGeneric = RouteRequestGeneric
+> extends Omit<BunRequest, 'params'> {
+    params: RouteRequestParams<T['params']>;
+
     /**
-     * Parsed, validated from schema body of reqeust
+     * #### Parses and validates body of request.
+     *
+     * - Parses body to JSON or text
+     * - Validates body with `schemaValidator` if it is provided.
+     *
+     * @returns Promise with handled body
+     *
+     * @example
+     *
+     * ```typescript
+     * request.handleBody().then((bodyData) => {
+     *   console.log(bodyData);
+     * })
+     * ```
      */
     handleBody: () => Promise<
         T extends { body: unknown } ? T['body'] : unknown
@@ -57,6 +98,7 @@ export interface RouteResponse<
     T extends { body: unknown } = { body: unknown }
 > {
     setHeader: (name: Header['name'], value: Header['value']) => void;
+
     send: (data: T['body'], options?: ResponseOptions) => void;
     redirect: (url: string, status: RedirectStatusCode | (number & {})) => void;
 }
@@ -65,6 +107,7 @@ export type Route = Partial<Record<HttpMethod, RouteOptions>>;
 
 export type RouteHandler = (
     request: RouteRequest,
+
     response: RouteResponse
 ) => Promise<void> | void;
 
