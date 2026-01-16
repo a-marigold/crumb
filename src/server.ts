@@ -35,7 +35,8 @@ export const _routes: Routes = new Map();
 
 /**
  *
- * Runtime function that used in request.
+ *
+ *
  * Parses body to supported content type (json, plain text) and validates it with route schema.
  *
  * @param {BunRequest} request incoming bun request.

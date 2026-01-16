@@ -248,4 +248,49 @@ describe('wrapRouteCallback', () => {
             });
         });
     });
+
+    describe('query string and url params', () => {
+        it('should handle query string correctly', () => {
+            const requestUrl =
+                'https://example.com/users/:id?value=10&key=test';
+
+            type ResponseData = {
+                params: Record<string, string | undefined>;
+                query: URLSearchParams;
+            };
+
+            const wrappedCallback = wrapRouteCallback({
+                url: '/users/:id',
+                method: 'GET',
+                handler: (
+                    request,
+                    response: RouteResponse<{ body: ResponseData }>
+                ) => {
+                    return response.send({
+                        params: request.params,
+                        query: request.query,
+                    });
+                },
+            });
+
+            const requestParams = { id: '16' };
+
+            const request = new Request(requestUrl) as BunRequest;
+
+            (request as any).params = requestParams;
+            wrappedCallback(request)
+                .then((response) => response.json())
+                .then((data) => {
+                    const parsedUrl = new URL(requestUrl);
+
+                    expect((data as ResponseData).params).toEqual(
+                        requestParams
+                    );
+
+                    expect(JSON.stringify((data as ResponseData).query)).toBe(
+                        JSON.stringify(parsedUrl.searchParams)
+                    );
+                });
+        });
+    });
 });

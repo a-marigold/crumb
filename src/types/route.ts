@@ -34,6 +34,7 @@ export interface RouteRequestGeneric {
 export interface RouteRequest<
     T extends RouteRequestGeneric = RouteRequestGeneric
 > extends Omit<BunRequest, 'params'> {
+    query: URLSearchParams;
     params: RouteRequestParams<T['params']>;
 
     /**
@@ -121,6 +122,14 @@ export interface RouteResponse<
      */
     setHeader: (name: Header['name'], value: Header['value']) => void;
 
+    /**
+     *
+     * @param options `Bun.Cookie` options parametr
+     *
+     *
+     *
+     *
+     */
     setCookie: (options: CookieInit) => void;
 }
 
