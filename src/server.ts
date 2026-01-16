@@ -2,6 +2,7 @@ import { serve } from 'bun';
 
 import type { BunRequest } from 'bun';
 
+import type { BodyInit } from 'bun';
 import { HttpError } from './errors/HttpError';
 
 import type {
@@ -11,8 +12,7 @@ import type {
     RouteResponse,
     Headers,
     HttpMethod,
-} from './types/route';
-
+} from './types';
 import type { SchemaData, Validate } from './types';
 
 import type { ListenOptions } from './types';
@@ -32,7 +32,9 @@ export type Routes = Map<RouteOptions['url'], Route>;
  * An internal Map with routes of app. Do not use it in user code to prevent undefined errors
  */
 export const _routes: Routes = new Map();
+
 /**
+ *
  * Runtime function that used in request.
  * Parses body to supported content type (json, plain text) and validates it with route schema.
  *
@@ -75,6 +77,7 @@ export const handleBody = (
         'text/plain': (request: BunRequest) => {
             return request
                 .text()
+
                 .catch((error) => {
                     throw new HttpError(400, error);
                 })
@@ -106,22 +109,28 @@ const handleRequest = (
     let status: number = 200;
     let statusText: string | undefined = '';
 
-    let responseBody: string = '';
+    let responseBody: BodyInit = '';
     const responseHeaders: Headers = {};
 
     const routeResponse: RouteResponse = {
         setHeader: (name, value) => {
-            responseHeaders[name] = value;
+            responseHeaders[name.toLowerCase()] = value;
         },
         send: (data, options) => {
             if (typeof data === 'object') {
-                responseHeaders['Content-Type'] = 'application/json';
+                if (!responseHeaders['content-type']) {
+                    responseHeaders['content-type'] = 'application/json';
+                }
 
                 responseBody = JSON.stringify(data);
             } else if (typeof data === 'string') {
-                responseHeaders['Content-Type'] = 'text/plain';
+                if (!responseHeaders['content-type']) {
+                    responseHeaders['content-type'] = 'text/plain';
+                }
 
                 responseBody = data;
+            } else {
+                responseBody = data as BodyInit;
             }
 
             if (options) {
@@ -132,7 +141,7 @@ const handleRequest = (
         redirect: (url, redirectStatus) => {
             responseBody = '';
             status = redirectStatus;
-            responseHeaders['Location'] = url;
+            responseHeaders['location'] = url;
         },
     };
 
@@ -142,6 +151,7 @@ const handleRequest = (
         () =>
             new Response(responseBody, {
                 headers: responseHeaders,
+
                 status,
                 statusText,
             })
@@ -159,6 +169,7 @@ const handleRequest = (
  *
  *
  * @param routeOptions options of route
+ *
  * @returns {WrappedRouteCallback} Function that is ready to be used in Bun.serve `routes`
  */
 export const wrapRouteCallback = (
@@ -182,6 +193,7 @@ export const wrapRouteCallback = (
         return Promise.resolve(
             handleRequest(
                 // assertion is not dangerous because `handleBody` function is identified above
+
                 routeRequest as RouteRequest,
 
                 routeOptions
@@ -288,6 +300,7 @@ export const prepareRoutes = (
  *
  *
  *
+ *
  * @example
  *
  * ```typescript
@@ -301,7 +314,9 @@ export const prepareRoutes = (
 export const listen = (options?: ListenOptions): void => {
     serve({
         port: options?.port,
+
         hostname: options?.hostname,
+
         development: options?.development ?? false,
 
         routes: prepareRoutes(_routes, options?.schemaValidator),

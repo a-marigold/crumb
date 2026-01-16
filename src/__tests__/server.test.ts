@@ -121,7 +121,7 @@ describe('wrapRouteCallback', () => {
         const testRequest = new Request('https://localhost:3000') as BunRequest;
 
         jsonWrappedCallback(testRequest).then((response) => {
-            const bodyPromise = response.json();
+            const bodyPromise = response.text();
 
             bodyPromise.then((bodyData) => {
                 expect(bodyData).toBe(textResponesData);
