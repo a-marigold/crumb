@@ -9,11 +9,11 @@
 
 ### Features
 
--   Only Bun is supported
+- Only Bun is supported
 
--   No classes
+- No classes
 
--   Uses Bun’s HTTP API
+- Uses `Bun.serve` routes
 
 ### Installation
 
@@ -34,59 +34,158 @@ const products: Product[] = [];
 
 createRoute({
     url: '/products',
+
     method: 'GET',
+
     handler: (request, response: RouteResponse<{ body: Product[] }>) => {
         return response.send(
             [
-                { title: 'cookie', price: 100, id: 1 },
-                { title: 'bread', price: 1600, id: 2 },
+                { title: 'bananas', price: 0.57, id: 1 },
+
+                { title: 'bread', price: 0.89, id: 2 },
+
+                { title: 'milk', price: 0.83, id: 3 },
             ],
-            { status: 200 }
+
+            { status: 200 },
         );
     },
 });
 ```
 
-&nbsp;
+### Benchmarks
 
-Middleware / Pre-handlers
+- Machine:
+    - windows 11
+    - intel core i5 10300H
+    - 16gb ram
+
+- Load testing tool: grafana/k6
+
+- Bun version: 1.3.6
+
+<details> 
+    <summary>k6 script</summary>
+
+```bash
+    sleep 1 | k6 run script.js
+```
+
+```javascript
+import { PORT } from './constants.js';
+
+import http from 'k6/http';
+
+export const options = {
+    scenarios: {
+        load: {
+            executor: 'constant-arrival-rate',
+
+            rate: 16000,
+            timeUnit: '1s',
+
+            duration: '30s',
+            preAllocatedVUs: 1000,
+
+            maxVUs: 3000,
+        },
+    },
+};
+
+export default () => {
+    http.post(
+        'http://localhost:' + PORT + '/',
+        JSON.stringify({ key: 'value' }),
+        { headers: { 'Content-Type': 'application/json' } },
+    );
+};
+```
+
+</details>
+
+<details>
+    <summary>Pure Bun server code</summary>
 
 ```typescript
-import { createRoute, type RouteResponse } from 'bun-crumb';
+import { serve, stdout } from 'bun';
 
-type Product = { title: string; price: number; id: number };
+import { PORT } from './constants';
 
-const products: Product[] = [];
+serve({
+    routes: {
+        '/': {
+            POST: (request) => {
+                return request.json().then(
+                    (body) =>
+                        new Response(JSON.stringify(body), {
+                            headers: { 'Content-Type': 'application/json' },
+                        }),
+                );
+            },
+        },
+    },
+    port: PORT,
+});
+stdout.write('Bun is running\n');
+```
 
-createRoute({
-    url: '/products',
+</details>
+
+<details>
+    <summary>Fastify server code</summary>
+
+```typescript
+import Fastify from 'fastify';
+
+import { PORT } from './constants';
+
+const fastify = Fastify({ logger: false });
+
+fastify.route({
+    url: '/',
     method: 'POST',
-    preHandler: (request, response) => {
-        if (products.find((product) => product.id === request.body.id)) {
-            return response.send(
-                { message: 'Product with this id already exists' },
-                { status: 409 }
-            );
-        }
+    handler: (request, response) => {
+        return response.send(request.body);
     },
-    handler: (request, response: RouteResponse<{ body: Product }>) => {
-        products.push(body);
+});
 
-        return response.send(body, { status: 201 });
-    },
+fastify.listen({ port: PORT }, () => {
+    Bun.stdout.write('Fastify is running\n');
 });
 ```
 
-&nbsp;
+</details>
 
-Setting Headers and Status
+<details>
+    <summary>Bun Crumb server code</summary>
+
+```bash
+sleep 1 | k6 run script.js
+```
 
 ```typescript
-import { createRoute } from 'bun-crumb';
+import { PORT } from './constants';
 
+import { listen, createRoute } from 'bun-crumb';
+
+//
 createRoute({
-    url: '/auth',
+    url: '/',
+
     method: 'POST',
-    handler: (request, response) => {},
+
+    handler: (request, response) => {
+        return request.handleBody().then(response.send);
+    },
 });
+
+listen({ port: PORT });
 ```
+
+</details>
+
+| Library   | Total requests | RPS            | Requests failed | Avg. request duration |
+| --------- | -------------- | -------------- | --------------- | --------------------- |
+| Pure Bun  | 482681         | 15958.069946/s | 0.00% (0)       | 12.48ms               |
+| Bun Crumb | 474870         | 15789.504029/s | 0.02% (101)     | 23.08ms               |
+| Fastify   | 364525         | 12060.63486/s  | 0.27% (1002)    | 237.68ms              |

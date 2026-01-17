@@ -45,13 +45,17 @@ export const _routes: Routes = new Map();
  * @param {Validate} schemaValidator schema validator function that receives `data` and `schema` arguments.
  *
  * @returns {Promise<unknown>} Promise with body
+ *
+ *
+ *
+ *
  */
 export const handleBody = (
     request: BunRequest,
     contentType: string,
 
     schema?: SchemaData,
-    schemaValidator?: Validate
+    schemaValidator?: Validate,
 ): Promise<unknown> => {
     const contentHandlers = {
         'application/json': (request: BunRequest) => {
@@ -68,7 +72,7 @@ export const handleBody = (
                     ) {
                         throw new HttpError(
                             400,
-                            'Request does not match schema'
+                            'Request does not match schema',
                         );
                     }
                     return data;
@@ -90,7 +94,7 @@ export const handleBody = (
                     ) {
                         throw new HttpError(
                             400,
-                            'Request does not match schema'
+                            'Request does not match schema',
                         );
                     }
                     return data;
@@ -105,7 +109,7 @@ export const handleBody = (
 
 const handleRequest = (
     routeRequest: RouteRequest,
-    routeOptions: RouteOptions
+    routeOptions: RouteOptions,
 ): Promise<Response> => {
     let status: number = 200;
     let statusText: string | undefined = '';
@@ -151,13 +155,13 @@ const handleRequest = (
         setCookie: (options) => {
             responseHeaders.append(
                 'Set-Cookie',
-                new Cookie(options).toString()
+                new Cookie(options).toString(),
             );
         },
     };
 
     return Promise.resolve(
-        routeOptions.handler(routeRequest, routeResponse)
+        routeOptions.handler(routeRequest, routeResponse),
     ).then(
         () =>
             new Response(responseBody, {
@@ -165,7 +169,7 @@ const handleRequest = (
 
                 status,
                 statusText,
-            })
+            }),
     );
 };
 
@@ -185,7 +189,7 @@ const handleRequest = (
  */
 export const wrapRouteCallback = (
     routeOptions: RouteOptions,
-    schemaValidator?: Validate
+    schemaValidator?: Validate,
 ): WrappedRouteCallback => {
     return (request) => {
         const contentType = request.headers.get('Content-Type') ?? 'text/plain';
@@ -197,12 +201,12 @@ export const wrapRouteCallback = (
                 request,
                 contentType,
                 routeOptions.schema,
-                schemaValidator
+                schemaValidator,
             );
         };
 
         routeRequest.query = new URLSearchParams(
-            request.url.split('?')[1] || ''
+            request.url.split('?')[1] || '',
         );
 
         return Promise.resolve(
@@ -211,8 +215,8 @@ export const wrapRouteCallback = (
 
                 routeRequest as RouteRequest,
 
-                routeOptions
-            )
+                routeOptions,
+            ),
         )
             .then((response) => response)
             .catch((error) => {
@@ -267,7 +271,7 @@ export const wrapRouteCallback = (
 export const prepareRoute = (
     route: Route,
 
-    schemaValidator?: Validate
+    schemaValidator?: Validate,
 ): PreparedRoute => {
     const preparedRoute: PreparedRoute = {};
 
@@ -278,7 +282,7 @@ export const prepareRoute = (
             preparedRoute[method as HttpMethod] = wrapRouteCallback(
                 route[method as HttpMethod] as RouteOptions,
 
-                schemaValidator
+                schemaValidator,
             );
         }
     }
@@ -296,7 +300,7 @@ export const prepareRoute = (
  */
 export const prepareRoutes = (
     routes: Routes,
-    schemaValidator?: Validate
+    schemaValidator?: Validate,
 ): PreparedRoutes => {
     const preparedRoutes: PreparedRoutes = {};
     for (const route of routes) {
@@ -308,7 +312,8 @@ export const prepareRoutes = (
 };
 
 /**
- * Starts serving http server.
+ *
+ *  Starts to serve http server.
  *
  *
  * @param {ListenOption} options - options
@@ -330,7 +335,6 @@ export const listen = (options?: ListenOptions): void => {
     const server = serve({
         port: options?.port,
         hostname: options?.hostname,
-
         development: options?.development ?? false,
 
         routes: prepareRoutes(_routes, options?.schemaValidator),

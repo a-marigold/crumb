@@ -11,7 +11,7 @@
     },
     "scripts": {},
     "dependencies": {
-        "bun-crumb": "^0.11.0",
+        "bun-crumb": "^0.12.0",
         "fastify": "^5.6.2",
         "zod": "^4.2.1"
     },
