@@ -10,7 +10,7 @@ import type { Header, HttpMethod, RedirectStatusCode } from './utils';
  * Type of Request search parameters
  */
 export type RouteRequestParams<T extends string | undefined = undefined> = [
-    T
+    T,
 ] extends [string]
     ? {
           [K in T]: string;
@@ -32,7 +32,7 @@ export interface RouteRequestGeneric {
  * Type of route handler `request` parameter
  */
 export interface RouteRequest<
-    T extends RouteRequestGeneric = RouteRequestGeneric
+    T extends RouteRequestGeneric = RouteRequestGeneric,
 > extends Omit<BunRequest, 'params'> {
     query: URLSearchParams;
     params: RouteRequestParams<T['params']>;
@@ -68,9 +68,9 @@ export interface ResponseOptions {
  * Type of route handler `response`
  */
 export interface RouteResponse<
-    T extends { body: unknown } = { body: unknown }
+    T extends { body: unknown } = { body: unknown },
 > {
-    send: (data: T['body'], options?: ResponseOptions) => void;
+    send: (data?: T['body'], options?: ResponseOptions) => void;
 
     /**
      * Sets `Location` header to provided `url` and `response.status` to provided `status`
@@ -95,7 +95,7 @@ export interface RouteResponse<
      */
     redirect: (
         url: string,
-        status?: RedirectStatusCode | (number & {})
+        status?: RedirectStatusCode | (number & {}),
     ) => void;
 
     /**
@@ -124,7 +124,7 @@ export interface RouteResponse<
 
     /**
      *
-     * @param options `Bun.Cookie` options parametr
+     * @param options `Bun.Cookie` options parameter
      *
      *
      *
@@ -138,7 +138,7 @@ export type Route = Partial<Record<HttpMethod, RouteOptions>>;
 export type RouteHandler = (
     request: RouteRequest,
 
-    response: RouteResponse
+    response: RouteResponse,
 ) => Promise<void> | void;
 
 export type RouteOptions = {

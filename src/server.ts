@@ -278,7 +278,6 @@ export const prepareRoute = (
     for (const method in route) {
         if (Object.hasOwn(route, method)) {
             // assertions below are not dangerous because method is own property and it is already in the route
-
             preparedRoute[method as HttpMethod] = wrapRouteCallback(
                 route[method as HttpMethod] as RouteOptions,
 
