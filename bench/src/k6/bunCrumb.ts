@@ -1,6 +1,6 @@
 import { PORT } from './constants';
 
-import { listen, createRoute } from 'bun-crumb';
+import { listen, createRoute } from '../../../dist';
 
 //
 createRoute({

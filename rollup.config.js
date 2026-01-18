@@ -8,7 +8,7 @@ import terser from '@rollup/plugin-terser';
 
 export default defineConfig([
     {
-        external: ['bun', './src/__tests__', './src/bench'],
+        external: ['bun', './src/__tests__', './bench'],
 
         input: './src/index.ts',
 
@@ -23,7 +23,7 @@ export default defineConfig([
         ],
     },
     {
-        external: ['bun', './src/__tests__', './src/bench'],
+        external: ['bun', './src/__tests__', './bench'],
         input: './src/index.ts',
         output: {
             file: './dist/index.d.ts',

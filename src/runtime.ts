@@ -11,6 +11,61 @@ import type {
     Validate,
 } from './types';
 
+type ContentHandler = (
+    request: BunRequest,
+    schema?: SchemaData,
+    schemaValidator?: Validate,
+) => Promise<unknown>;
+
+/**
+ * An util function for throwing `HttpError` with 400 as code and 'Bad Request' as message
+ */
+const throwBadRequestHttpError = () => {
+    throw new HttpError(400, 'Bad Request');
+};
+
+/**
+ * *Internal server object.*
+ *
+ * The handlers of `request.body`.
+ *
+ * Used for {@link handleBody} function
+ */
+const contentHandlers: { [contentType: string]: ContentHandler } = {
+    'application/json': (request, schema, schemaValidator) => {
+        return request
+            .json()
+            .catch(throwBadRequestHttpError)
+            .then((data) => {
+                if (
+                    schema &&
+                    schemaValidator &&
+                    !schemaValidator(data, schema)
+                ) {
+                    throw new HttpError(400, 'Request does not match schema');
+                }
+
+                return data;
+            });
+    },
+    'text/plain': (request, schema, schemaValidator) => {
+        return request
+            .text()
+            .catch(throwBadRequestHttpError)
+            .then((data) => {
+                if (
+                    schema &&
+                    schemaValidator &&
+                    !schemaValidator(data, schema)
+                ) {
+                    throw new HttpError(400, 'Request does not match schema');
+                }
+
+                return data;
+            });
+    },
+};
+
 /**
  *
  * *Internal server function.*
@@ -33,54 +88,10 @@ export const handleBody = (
     schema?: SchemaData,
     schemaValidator?: Validate,
 ): Promise<unknown> => {
-    const contentHandlers = {
-        'application/json': (request: BunRequest) => {
-            return request
-                .json()
-                .catch(() => {
-                    throw new HttpError(400, 'Bad Request');
-                })
-                .then((data) => {
-                    if (
-                        schema &&
-                        schemaValidator &&
-                        !schemaValidator(data, schema)
-                    ) {
-                        throw new HttpError(
-                            400,
-                            'Request does not match schema',
-                        );
-                    }
-                    return data;
-                });
-        },
-
-        'text/plain': (request: BunRequest) => {
-            return request
-                .text()
-
-                .catch((error) => {
-                    throw new HttpError(400, error);
-                })
-                .then((data) => {
-                    if (
-                        schema &&
-                        schemaValidator &&
-                        !schemaValidator(data, schema)
-                    ) {
-                        throw new HttpError(
-                            400,
-                            'Request does not match schema',
-                        );
-                    }
-                    return data;
-                });
-        },
-    };
-
-    return contentType in contentHandlers
-        ? contentHandlers[contentType as keyof typeof contentHandlers](request)
-        : Promise.reject(new HttpError(415, 'Unsupported media type'));
+    return (
+        contentHandlers[contentType]?.(request, schema, schemaValidator) ||
+        Promise.reject(new HttpError(415, 'Unsupported media type'))
+    );
 };
 
 /**
