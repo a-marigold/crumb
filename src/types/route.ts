@@ -70,6 +70,46 @@ export interface ResponseOptions {
 export interface RouteResponse<
     T extends { body: unknown } = { body: unknown },
 > {
+    /**
+     * Sets Response body to provided `data`.
+     * Automatically sets `Content-Type` to `application/json` if an object was provided and transforms `data` to JSON.
+     *
+     * ### **IMPORTANT NOTES**:
+     *  - #### If `Content-Type` header is already set, this function will not change this header.
+     *
+     *
+     *
+     *
+     *  - #### If you want to complete request and send response, you must necessarily `return` the call of this function. Otherwise, code of your handler will continue executing and `Response` body could be changed.
+     *
+     * @param data value that will be sent to client
+     * @param options standard `Response` options from web API
+     *
+     * @example
+     * ```typescript
+     * response.setHeader('content-type', 'x-www-form-urlencoded'); // Set `Content-Type` header
+     *
+     * return response.send('Hello'); // This does not change `Content-Type` header, because this header is set above
+     * ```
+     *
+     * @example
+     * ```typescript
+     * return response.send('Hello'); // This sets `Content-Type` header to `text/plain`, because this header is not set above.
+     * ```
+     *
+     * @example
+     * ```typescript
+     * return response.send({ key: 'value' }); // This will set `Content-Type` header to `application/json`, because this header is not set above. Object is transformed to JSON automatically
+     * ```
+     *
+     * @example
+     * ```typescript
+     * response.send({key: 'value'}); // ❌ Without return, the code below changes the body of response
+     * response.send('Hello'); // ❌ This changes the body of response, but `Content-Type` header will not change
+     * ```
+     *
+     */
+
     send: (data?: T['body'], options?: ResponseOptions) => void;
 
     /**
@@ -79,7 +119,7 @@ export interface RouteResponse<
      *
      * @param url `Location` to redirect
      *
-     * @param status redirect http code (`3xx`)
+     * @param status redirect http code (`3xx`). Equals to 302 by default
      *
      * @example
      *
@@ -90,7 +130,7 @@ export interface RouteResponse<
      * The same behaviour is
      * ```typescript
      * response.setHeader('Location', 'https://bun-crumb.vercel.app');
-     * return response.send('', {status: 302});
+     * return response.send('', { status: 302 });
      * ```
      */
     redirect: (

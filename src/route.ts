@@ -3,7 +3,8 @@ import { _routes } from './server';
 import type { RouteOptions } from './types';
 
 /**
- * Creates a route with `url`, `method` and `handler`.
+ * #### Creates a route with `url`, `method` and `handler`.
+ *
  * Should be called before `listen` function is called.
  *
  *
@@ -27,8 +28,8 @@ import type { RouteOptions } from './types';
  *
  * @example
  * ```typescript
- * const deleteProduct = (
- *   request: RouteRequest,
+ * const deleteProduct: RouteHandler = (
+ *   request,
  *   response: RouteResponse<{ body: { error: string } | { product: Product } }>
  * ) => {
  *     const id = request.params.id;
